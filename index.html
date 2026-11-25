@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>지원자 요약 · 샘플</title>
+<meta name="description" content="잡코리아 지원자 요약 모바일 웹앱 — UI 샘플 화면(가상 예시)" />
+<meta name="theme-color" content="#3D7BFF" />
+<meta name="color-scheme" content="light" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="icon" href="./icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="./icon-192.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="지원자 요약" />
+<style>
+  :root{
+    --blue:#3D7BFF;
+    --blue-soft:#EAF1FF;
+    --ink:#16181D;
+    --ink-2:#4B5563;
+    --ink-3:#8B95A1;
+    --line:#E6EAF2;
+    --bg:#F4F6FB;
+    --card:#FFFFFF;
+    --yellow-soft:#FFF6E0;
+    --yellow-ink:#8A6100;
+    --radius:16px;
+    --safe-b:env(safe-area-inset-bottom, 0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:"Pretendard","Pretendard Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    font-size:15px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+  a{color:inherit}
+  .wrap{max-width:560px;margin:0 auto;padding:0 16px 210px;}
+
+  /* ---------- header ---------- */
+  header.top{
+    position:sticky;top:0;z-index:20;
+    background:rgba(244,246,251,.92);
+    backdrop-filter:saturate(180%) blur(12px);
+    -webkit-backdrop-filter:saturate(180%) blur(12px);
+    padding:16px 0 10px;
+    border-bottom:1px solid transparent;
+  }
+  .top-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  h1{font-size:23px;font-weight:800;letter-spacing:-.03em;margin:0}
+  .asof{font-size:12.5px;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .sample-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    margin-top:9px;padding:5px 10px 5px 8px;border-radius:999px;
+    background:#FFF1F1;color:#B4232B;border:1px solid #FBD5D7;
+    font-size:11.5px;font-weight:700;letter-spacing:-.01em;
+  }
+  .sample-badge .dot{width:6px;height:6px;border-radius:50%;background:#E23D46;flex:0 0 auto}
+
+  /* ---------- stats ---------- */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 14px}
+  .stat{background:var(--card);border-radius:var(--radius);padding:12px 12px 10px;border:1px solid var(--line)}
+  .stat b{display:block;font-size:24px;font-weight:800;letter-spacing:-.03em;color:var(--blue);line-height:1.15;font-variant-numeric:tabular-nums}
+  .stat span{font-size:12px;color:var(--ink-3);font-weight:600}
+  .stat:nth-child(2) b,.stat:nth-child(3) b{color:var(--ink)}
+
+  /* ---------- chips ---------- */
+  .filters{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none;-ms-overflow-style:none}
+  .filters::-webkit-scrollbar{display:none}
+  .chip{
+    flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;
+    padding:8px 13px;border-radius:999px;background:#fff;border:1px solid var(--line);
+    font-size:13px;font-weight:650;color:var(--ink-2);white-space:nowrap;transition:.15s;
+  }
+  .chip i{font-style:normal;font-size:11.5px;color:var(--ink-3);font-weight:700;font-variant-numeric:tabular-nums}
+  .chip[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 6px 14px rgba(61,123,255,.24)}
+  .chip[aria-pressed="true"] i{color:rgba(255,255,255,.85)}
+
+  .toggle-row{display:flex;align-items:center;gap:10px;margin:0 2px 14px}
+  .switch{display:inline-flex;align-items:center;gap:9px;font-size:13.5px;font-weight:650;color:var(--ink-2)}
+  .switch .track{width:42px;height:25px;border-radius:999px;background:#D5DBE6;position:relative;transition:.2s;flex:0 0 auto}
+  .switch .track::after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.2s}
+  .switch[aria-checked="true"] .track{background:var(--blue)}
+  .switch[aria-checked="true"] .track::after{transform:translateX(17px)}
+  .result-count{margin-left:auto;font-size:12.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+
+  /* ---------- cards ---------- */
+  .list{display:flex;flex-direction:column;gap:9px}
+  .card{
+    position:relative;display:block;width:100%;text-align:left;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:13px 14px 12px;transition:transform .12s,box-shadow .12s,border-color .12s;
+  }
+  .card:active{transform:scale(.986);border-color:#C9D7F7}
+  .card .row1{display:flex;align-items:center;gap:7px;min-height:22px}
+  .newdot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex:0 0 auto;box-shadow:0 0 0 3px rgba(61,123,255,.13)}
+  .name{font-size:16px;font-weight:800;letter-spacing:-.02em}
+  .applied{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  .posting{
+    margin-left:auto;flex:0 0 auto;max-width:52%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-soft);
+    padding:3px 8px;border-radius:6px;
+  }
+  .meta{margin-top:5px;font-size:13px;color:var(--ink-2);display:flex;flex-wrap:wrap;align-items:center;gap:0}
+  .meta .sep{color:#C7CFDC;margin:0 6px}
+  .sub{margin-top:4px;font-size:12.5px;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
+  .row2{display:flex;align-items:center;gap:6px;margin-top:9px;flex-wrap:wrap}
+  .badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+  .b-miyul{background:#F1F3F7;color:#6B7684}
+  .b-review{background:#EEF2FF;color:#4B5FBF}
+  .b-interview{background:#E9F7EF;color:#1E7A4B}
+  .b-alert{background:var(--yellow-soft);color:var(--yellow-ink);border:1px solid #F6E2B0}
+  .b-new{background:var(--blue);color:#fff;letter-spacing:.02em;padding:2px 6px;font-size:10px}
+
+  .empty{
+    text-align:center;background:#fff;border:1px dashed var(--line);border-radius:var(--radius);
+    padding:34px 18px;color:var(--ink-3);font-size:14px;line-height:1.6;
+  }
+  .empty b{display:block;color:var(--ink-2);font-size:15px;margin-bottom:4px}
+
+  /* ---------- bottom bar ---------- */
+  .bottombar{
+    position:fixed;left:0;right:0;bottom:0;z-index:30;
+    background:linear-gradient(to bottom,rgba(244,246,251,0) 0%,var(--bg) 26%,var(--bg) 100%);
+    padding:22px 16px calc(12px + var(--safe-b));
+  }
+  .bottombar-inner{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+  .btn{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    width:100%;padding:15px 16px;border-radius:14px;font-size:15.5px;font-weight:750;letter-spacing:-.02em;
+    transition:transform .12s,filter .12s;
+  }
+  .btn:active{transform:scale(.988)}
+  .btn-primary{background:var(--blue);color:#fff;box-shadow:0 8px 20px rgba(61,123,255,.28)}
+  .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:0 2px 8px rgba(16,24,40,.04)}
+  .fineprint{margin:2px 2px 0;text-align:center;font-size:11.5px;color:var(--ink-3);line-height:1.5}
+
+  /* ---------- sheet ---------- */
+  .sheet-backdrop,.modal-backdrop{
+    position:fixed;inset:0;z-index:50;background:rgba(16,20,28,.42);
+    opacity:0;pointer-events:none;transition:opacity .22s;
+    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  }
+  .sheet-backdrop.open,.modal-backdrop.open{opacity:1;pointer-events:auto}
+  .sheet{
+    position:fixed;left:0;right:0;bottom:0;z-index:60;
+    max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    background:var(--bg);border-radius:22px 22px 0 0;
+    box-shadow:0 -10px 40px rgba(16,24,40,.18);
+    transform:translateY(102%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+    padding-bottom:calc(18px + var(--safe-b));
+  }
+  .sheet.open{transform:translateY(0)}
+  .grab{width:38px;height:4px;border-radius:2px;background:#D3D9E3;margin:9px auto 0}
+  .sheet-head{padding:14px 20px 12px;background:var(--bg)}
+  .sheet-head .line1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .sheet-head h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.03em}
+  .sheet-head .applied{font-size:12.5px}
+  .sheet-head .meta{margin-top:6px;font-size:13px}
+  .sheet-body{padding:0 16px}
+  .block{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px 15px;margin-bottom:9px}
+  .block h3{margin:0 0 8px;font-size:12.5px;font-weight:800;color:var(--blue);letter-spacing:.01em}
+  .career{padding:7px 0;border-top:1px solid #F1F3F8}
+  .career:first-of-type{border-top:0;padding-top:0}
+  .career .co{font-size:14px;font-weight:750;display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+  .career .per{font-size:11.5px;color:var(--ink-3);font-weight:600;font-variant-numeric:tabular-nums}
+  .career .role{font-size:12.5px;color:var(--ink-2);margin-top:2px}
+  .bullets{margin:0;padding:0;list-style:none}
+  .bullets li{position:relative;padding-left:12px;font-size:13.5px;color:var(--ink-2);line-height:1.6;margin:3px 0}
+  .bullets li::before{content:"";position:absolute;left:0;top:.62em;width:4px;height:4px;border-radius:50%;background:#B9C2D0}
+  .cover{font-size:13.5px;color:var(--ink-2);line-height:1.68}
+  .checks{background:var(--yellow-soft);border:1px solid #F6E2B0;border-radius:var(--radius);padding:13px 15px;margin-bottom:9px}
+  .checks h3{color:var(--yellow-ink);margin-bottom:7px}
+  .checks h3 em{font-style:normal;font-weight:600;font-size:11.5px;opacity:.8}
+  .checks ul{margin:0;padding:0;list-style:none}
+  .checks li{position:relative;padding-left:14px;font-size:13px;line-height:1.62;color:#6E5000;margin:2px 0}
+  .checks li::before{content:"";position:absolute;left:2px;top:.58em;width:5px;height:5px;border-radius:50%;background:#E0A21B}
+  .note{font-size:11.5px;color:var(--ink-3);text-align:center;line-height:1.6;padding:2px 4px 12px}
+  .sheet .btn{margin-top:2px}
+
+  /* ---------- modal ---------- */
+  .modal{
+    position:fixed;left:50%;top:50%;z-index:60;
+    width:min(440px,calc(100vw - 32px));
+    transform:translate(-50%,-50%) scale(.96);opacity:0;pointer-events:none;
+    transition:opacity .18s,transform .18s;
+    background:#fff;border-radius:20px;padding:22px 20px 16px;
+    box-shadow:0 20px 60px rgba(16,24,40,.28);
+  }
+  .modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+  .modal h2{margin:0 0 4px;font-size:18px;font-weight:800;letter-spacing:-.02em}
+  .modal .lead{margin:0 0 12px;font-size:12.5px;color:var(--ink-3)}
+  .modal p{margin:0 0 12px;font-size:13.5px;color:var(--ink-2);line-height:1.68}
+  .modal .box{background:var(--blue-soft);border-radius:12px;padding:12px 13px;margin-bottom:14px}
+  .modal .box b{display:block;font-size:12.5px;color:var(--blue);margin-bottom:4px}
+  .modal .box span{font-size:12.5px;color:#33477A;line-height:1.6;display:block}
+  .modal .btn{padding:13px;font-size:15px}
+
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="top-row">
+      <h1>지원자 요약</h1>
+      <span class="asof" id="asOf">기준 —</span>
+    </div>
+    <div class="sample-badge"><span class="dot"></span>샘플 화면 · 가상 예시</div>
+  </header>
+
+  <section class="stats" aria-label="요약 숫자">
+    <div class="stat"><b id="statNew">0</b><span>신규</span></div>
+    <div class="stat"><b id="statUnread">0</b><span>미열람</span></div>
+    <div class="stat"><b id="statTotal">0</b><span>전체</span></div>
+  </section>
+
+  <nav class="filters" id="filters" aria-label="공고 필터"></nav>
+
+  <div class="toggle-row">
+    <button class="switch" id="newOnly" role="switch" aria-checked="false">
+      <span class="track" aria-hidden="true"></span>새 지원자만
+    </button>
+    <span class="result-count" id="resultCount"></span>
+  </div>
+
+  <main class="list" id="list" aria-live="polite"></main>
+</div>
+
+<div class="bottombar">
+  <div class="bottombar-inner">
+    <button class="btn btn-primary" id="openRefresh">지금 조회</button>
+    <a class="btn btn-ghost" href="https://www.jobkorea.co.kr/Corp/Applicant/List" target="_blank" rel="noopener noreferrer">잡코리아 지원자 목록 열기 ↗</a>
+    <p class="fineprint">샘플 화면입니다 · 지원자 정보는 모두 가상 예시이며 실제 개인정보가 아닙니다.</p>
+  </div>
+</div>
+
+<!-- 상세 시트 -->
+<div class="sheet-backdrop" id="sheetBackdrop"></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetName" tabindex="-1">
+  <div class="grab" aria-hidden="true"></div>
+  <div class="sheet-head">
+    <div class="line1">
+      <h2 id="sheetName">—</h2>
+      <span class="applied" id="sheetApplied"></span>
+      <span class="badge" id="sheetStatus" style="margin-left:auto"></span>
+    </div>
+    <div class="meta" id="sheetMeta"></div>
+  </div>
+  <div class="sheet-body" id="sheetBody"></div>
+  <div class="sheet-body">
+    <p class="note">가상 예시 화면입니다 · 실제 조회는 피클 채팅에서 “잡코리아 지원자 확인해 줘”라고 말씀해 주세요.<br>조회한 내용은 저장하지 않습니다.</p>
+    <button class="btn btn-ghost" id="closeSheet">닫기</button>
+  </div>
+</section>
+
+<!-- 지금 조회 모달 -->
+<div class="modal-backdrop" id="modalBackdrop"></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <h2 id="modalTitle">지금 조회</h2>
+  <p class="lead">이 화면은 샘플이라 실제 지원자 정보는 담겨 있지 않습니다.</p>
+  <p>실제 조회는 피클 채팅에서 <b>‘잡코리아 지원자 확인해 줘’</b>라고 말씀하시면, 제가 하이어링센터에 접속해 이력서 열람 여부를 여쭤본 뒤 최신 요약을 채워 드립니다.</p>
+  <div class="box">
+    <b>인증번호(2단계 인증) 안내</b>
+    <span>로그인할 때 문자로 오는 6자리 인증번호를 채팅으로 알려주시면 그때 입력합니다. 비밀번호와 인증번호는 저장하지 않습니다.</span>
+  </div>
+  <button class="btn btn-primary" id="closeModal">확인</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- 가상 샘플 데이터 (실제 개인정보 아님) ---------- */
+  var POSTINGS = [
+    { id: "p1", title: "해외영업 담당" },
+    { id: "p2", title: "경영지원" }
+  ];
+
+  var APPLICANTS = [
+    {
+      id: "a1", posting: "p1", name: "김OO", applied: "11/25", isNew: true,
+      status: "미열람", career: "경력 6년", edu: "대졸", salary: "4,500만",
+      line: "(주)OO테크 영업기획 팀장 · B2B 영업 12명 운영",
+      checksShort: "희망연봉 초과",
+      careers: [
+        { co: "(주)OO테크", per: "2021.03~2025.10", role: "영업기획 팀장" },
+        { co: "OO산업", per: "2019.01~2021.02", role: "영업관리" }
+      ],
+      schools: [{ name: "OO대학교 경영학과 졸업", per: "2018" }],
+      highlights: ["B2B 영업조직 12명 운영, 연매출 30% 성장", "신규 채널 3개 개척"],
+      cover: "데이터로 영업을 설계하는 관리자입니다. 예산·파이프라인을 표로 관리해 분기 목표를 세웠고, 그 결과 3년 연속 목표를 넘겼습니다. 해외 바이어 대응 경험을 살려 귀사 B2B 사업 확장에 기여하고 싶습니다.",
+      checks: ["희망연봉 4,500만 — 공고 상한(4,000) 초과", "이직 사유 기재 없음"]
+    },
+    {
+      id: "a2", posting: "p1", name: "이OO", applied: "11/25", isNew: true,
+      status: "미열람", career: "경력 3년", edu: "초대졸", salary: "3,800만",
+      line: "OO전자 영업관리 · 신규 채널 3개 개척",
+      checksShort: "",
+      careers: [
+        { co: "OO전자", per: "2022.04~2025.09", role: "영업관리" },
+        { co: "OO무역", per: "2021.06~2022.03", role: "수출 서류 담당" }
+      ],
+      schools: [{ name: "OO전문대학 무역과 졸업", per: "2021" }],
+      highlights: ["신규 채널 3개 개척", "수출 서류·통관 실무 2년"],
+      cover: "수출 서류와 통관 실무를 직접 처리해 온 지원자입니다. 바이어 요청에 맞춰 납기를 조정한 경험이 있고, 해외영업으로 업무 범위를 넓히고 싶습니다.",
+      checks: []
+    },
+    {
+      id: "a3", posting: "p2", name: "박OO", applied: "11/24", isNew: true,
+      status: "미열람", career: "신입", edu: "대졸", salary: "3,200만",
+      line: "OO대 무역학과 · 무역실무 자격증",
+      checksShort: "",
+      careers: [],
+      schools: [{ name: "OO대학교 무역학과 졸업", per: "2026.02 예정" }],
+      highlights: ["무역실무 자격증 보유", "교내 무역 동아리 2년"],
+      cover: "무역학과에서 수출입 실무를 배웠고 무역실무 자격증을 취득했습니다. 문서 작성과 일정 관리에 강점이 있습니다.",
+      checks: []
+    },
+    {
+      id: "a4", posting: "p2", name: "최OO", applied: "11/23", isNew: false,
+      status: "서류검토", career: "경력 9년", edu: "대졸", salary: "6,000만",
+      line: "OO상사 영업본부 이사 · 해외법인 2곳 총괄",
+      checksShort: "희망연봉 초과",
+      careers: [
+        { co: "OO상사", per: "2019.02~2025.10", role: "영업본부 이사" },
+        { co: "OO글로벌", per: "2016.03~2019.01", role: "해외영업팀장" }
+      ],
+      schools: [{ name: "OO대학교 경영학과 졸업", per: "2015" }],
+      highlights: ["해외법인 2곳 총괄", "연매출 200억 조직 운영"],
+      cover: "해외법인 두 곳을 총괄하며 조직과 손익을 함께 관리했습니다. 지원 동기는 경영지원 조직의 체계를 세우는 역할입니다.",
+      checks: ["희망연봉 6,000만 — 공고 상한(4,200) 초과"]
+    },
+    {
+      id: "a5", posting: "p1", name: "정OO", applied: "11/22", isNew: false,
+      status: "미열람", career: "경력 2년", edu: "대졸", salary: "3,600만",
+      line: "OO물산 해외영업 · 유럽 바이어 담당",
+      checksShort: "경력 요건",
+      careers: [
+        { co: "OO물산", per: "2023.09~2025.08", role: "해외영업" }
+      ],
+      schools: [{ name: "OO대학교 불어불문학과 졸업", per: "2023" }],
+      highlights: ["유럽 바이어 5개사 담당", "영어·프랑스어 비즈니스 회화"],
+      cover: "유럽 바이어 응대와 오더 관리를 맡았습니다. 무역 실무 전반을 익히며 해외영업 경력을 쌓고 있습니다.",
+      checks: ["공고 필수요건(경력 3년 이상) — 기재 경력 2년"]
+    },
+    {
+      id: "a6", posting: "p2", name: "한OO", applied: "11/21", isNew: false,
+      status: "서류검토", career: "경력 4년", edu: "대졸", salary: "4,000만",
+      line: "OO제약 경영기획 · 예산·원가 관리",
+      checksShort: "",
+      careers: [
+        { co: "OO제약", per: "2021.07~2025.10", role: "경영기획" },
+        { co: "OO회계법인", per: "2020.01~2021.06", role: "감사보조" }
+      ],
+      schools: [{ name: "OO대학교 회계학과 졸업", per: "2019" }],
+      highlights: ["연간 예산 300억 편성", "원가 분석 리포트 월 1회"],
+      cover: "예산 편성과 원가 분석을 담당했습니다. 부서별 지출을 정리해 월 결산 일정을 앞당긴 경험이 있습니다.",
+      checks: []
+    },
+    {
+      id: "a7", posting: "p1", name: "오OO", applied: "11/20", isNew: false,
+      status: "면접", career: "경력 5년", edu: "대졸", salary: "4,200만",
+      line: "OO인터내셔널 해외영업 · 동남아 채널 운영",
+      checksShort: "",
+      careers: [
+        { co: "OO인터내셔널", per: "2020.05~2025.09", role: "해외영업 과장" },
+        { co: "OO트레이딩", per: "2019.01~2020.04", role: "수출입 담당" }
+      ],
+      schools: [{ name: "OO대학교 국제통상학과 졸업", per: "2018" }],
+      highlights: ["동남아 채널 매출 2배", "현지 전시회 3회 참가"],
+      cover: "동남아 채널을 맡아 매출을 두 배로 늘렸습니다. 현지 파트너와의 정기 미팅을 직접 운영했습니다.",
+      checks: []
+    }
+  ];
+
+  var STATUS_CLASS = {
+    "미열람": "b-miyul",
+    "서류검토": "b-review",
+    "면접": "b-interview"
+  };
+
+  var state = { posting: "all", newOnly: false };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function postingTitle(id) {
+    for (var i = 0; i < POSTINGS.length; i++) if (POSTINGS[i].id === id) return POSTINGS[i].title;
+    return "";
+  }
+
+  function filtered() {
+    return APPLICANTS.filter(function (a) {
+      if (state.posting !== "all" && a.posting !== state.posting) return false;
+      if (state.newOnly && !a.isNew) return false;
+      return true;
+    });
+  }
+
+  /* ---------- 필터 칩 ---------- */
+  function renderFilters() {
+    var html = "";
+    var total = APPLICANTS.length;
+    html += '<button class="chip" data-posting="all" aria-pressed="' + (state.posting === "all") + '">전체 공고<i>' + total + "</i></button>";
+    POSTINGS.forEach(function (p) {
+      var n = APPLICANTS.filter(function (a) { return a.posting === p.id; }).length;
+      html += '<button class="chip" data-posting="' + p.id + '" aria-pressed="' + (state.posting === p.id) + '">' +
+        esc(p.title) + "<i>" + n + "</i></button>";
+    });
+    $("filters").innerHTML = html;
+  }
+
+  /* ---------- 목록 + 숫자 ---------- */
+  function render() {
+    var rows = filtered();
+
+    $("statNew").textContent = rows.filter(function (a) { return a.isNew; }).length;
+    $("statUnread").textContent = rows.filter(function (a) { return a.status === "미열람"; }).length;
+    $("statTotal").textContent = rows.length;
+    $("resultCount").textContent = rows.length + "명 표시";
+
+    if (rows.length === 0) {
+      $("list").innerHTML = '<div class="empty"><b>' +
+        (state.newOnly ? "새 지원자 없음" : "해당 공고 지원자 없음") +
+        "</b>" + esc($("asOf").textContent) + " 기준</div>";
+      return;
+    }
+
+    $("list").innerHTML = rows.map(function (a) {
+      var badges =
+        (a.checksShort ? '<span class="badge b-alert">확인 필요</span>' : "") +
+        '<span class="badge ' + (STATUS_CLASS[a.status] || "b-miyul") + '">' + esc(a.status) + "</span>";
+      return '<button class="card" data-id="' + a.id + '" aria-label="' + esc(a.name) + " 상세 보기\">" +
+        '<div class="row1">' +
+          (a.isNew ? '<span class="newdot" aria-hidden="true"></span><span class="badge b-new">NEW</span>' : "") +
+          '<span class="name">' + esc(a.name) + "</span>" +
+          '<span class="applied">' + esc(a.applied) + "</span>" +
+          '<span class="posting">' + esc(postingTitle(a.posting)) + "</span>" +
+        "</div>" +
+        '<div class="meta"><span>' + esc(a.career) + '</span><span class="sep">·</span><span>' + esc(a.edu) +
+          '</span><span class="sep">·</span><span>희망 ' + esc(a.salary) + "</span></div>" +
+        '<div class="sub">' + esc(a.line) + "</div>" +
+        '<div class="row2">' + badges + "</div>" +
+      "</button>";
+    }).join("");
+  }
+
+  /* ---------- 상세 시트 ---------- */
+  function openSheet(a) {
+    $("sheetName").textContent = a.name;
+    $("sheetApplied").textContent = a.applied + " 지원";
+    var st = $("sheetStatus");
+    st.className = "badge " + (STATUS_CLASS[a.status] || "b-miyul");
+    st.textContent = a.status;
+    $("sheetMeta").innerHTML =
+      '<span>' + esc(a.career) + '</span><span class="sep">·</span><span>' + esc(a.edu) +
+      '</span><span class="sep">·</span><span>희망 ' + esc(a.salary) + "</span>";
+
+    var h = "";
+    h += '<div class="block"><h3>경력</h3>';
+    if (a.careers.length === 0) {
+      h += '<div class="cover">신입 — 기재된 경력 없음</div>';
+    } else {
+      a.careers.slice(0, 3).forEach(function (c) {
+        h += '<div class="career"><div class="co">' + esc(c.co) + '<span class="per">' + esc(c.per) + "</span></div>" +
+             '<div class="role">' + esc(c.role) + "</div></div>";
+      });
+      if (a.careers.length > 3) h += '<div class="career"><div class="role">외 ' + (a.careers.length - 3) + "건</div></div>";
+    }
+    h += "</div>";
+
+    h += '<div class="block"><h3>학력</h3><ul class="bullets">';
+    a.schools.forEach(function (s) {
+      h += "<li>" + esc(s.name) + " (" + esc(s.per) + ")</li>";
+    });
+    h += "</ul></div>";
+
+    h += '<div class="block"><h3>핵심 경험</h3><ul class="bullets">';
+    a.highlights.slice(0, 3).forEach(function (x) { h += "<li>" + esc(x) + "</li>"; });
+    h += "</ul></div>";
+
+    h += '<div class="block"><h3>자기소개 요지</h3><p class="cover">' + esc(a.cover) + "</p></div>";
+
+    if (a.checks.length) {
+      h += '<div class="checks"><h3>확인 필요 <em>(참고용)</em></h3><ul>';
+      a.checks.forEach(function (c) { h += "<li>" + esc(c) + "</li>"; });
+      h += "</ul></div>";
+    }
+
+    $("sheetBody").innerHTML = h;
+    $("sheetBackdrop").classList.add("open");
+    $("sheet").classList.add("open");
+    document.body.style.overflow = "hidden";
+    $("sheet").focus();
+  }
+
+  function closeSheet() {
+    $("sheetBackdrop").classList.remove("open");
+    $("sheet").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  function openModal() {
+    $("modalBackdrop").classList.add("open");
+    $("modal").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeModal() {
+    $("modalBackdrop").classList.remove("open");
+    $("modal").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  /* ---------- 이벤트 ---------- */
+  $("filters").addEventListener("click", function (e) {
+    var b = e.target.closest(".chip");
+    if (!b) return;
+    state.posting = b.getAttribute("data-posting");
+    renderFilters();
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  $("newOnly").addEventListener("click", function () {
+    state.newOnly = !state.newOnly;
+    this.setAttribute("aria-checked", String(state.newOnly));
+    render();
+  });
+
+  $("list").addEventListener("click", function (e) {
+    var b = e.target.closest(".card");
+    if (!b) return;
+    var a = APPLICANTS.filter(function (x) { return x.id === b.getAttribute("data-id"); })[0];
+    if (a) openSheet(a);
+  });
+
+  $("closeSheet").addEventListener("click", closeSheet);
+  $("sheetBackdrop").addEventListener("click", closeSheet);
+  $("openRefresh").addEventListener("click", openModal);
+  $("closeModal").addEventListener("click", closeModal);
+  $("modalBackdrop").addEventListener("click", closeModal);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closeSheet(); closeModal(); }
+  });
+
+  /* ---------- 기준 시각 ---------- */
+  (function () {
+    var d = new Date();
+    var mm = String(d.getMonth() + 1);
+    var dd = String(d.getDate());
+    var hh = String(d.getHours()).padStart(2, "0");
+    var mi = String(d.getMinutes()).padStart(2, "0");
+    $("asOf").textContent = mm + "/" + dd + " " + hh + ":" + mi + " 기준";
+  })();
+
+  renderFilters();
+  render();
+
+  /* ---------- PWA ---------- */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("./sw.js").catch(function () {});
+    });
+  }
+})();
+</script>
+</body>
+</html>
